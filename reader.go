@@ -42,7 +42,7 @@ func (r *Reader) ReadBits(l uint) (n uint64, err error) {
 				shift := 8 - l
 				n <<= l
 				n += uint64(b >> byte(shift))
-				r.rest = b&1<<byte(shift) - 1
+				r.rest = b & (1<<byte(shift) - 1)
 				r.size = shift
 				l = 0
 			}
