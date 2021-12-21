@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/socketcafe/bitwise"
+	"github.com/30c27b/bitwise"
 )
 
 func TestReader(t *testing.T) {
