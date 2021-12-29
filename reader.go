@@ -5,13 +5,18 @@ import (
 	"io"
 )
 
+type bitReader interface {
+	io.Reader
+	io.ByteReader
+}
+
 type Reader struct {
-	in   io.ByteReader
+	in   bitReader
 	rest byte
 	size uint
 }
 
-func NewReader(in io.ByteReader) *Reader {
+func NewReader(in bitReader) *Reader {
 	return &Reader{in: in}
 }
 
@@ -48,8 +53,19 @@ func (r *Reader) ReadBits(l uint) (n uint64, err error) {
 			}
 		}
 	}
-
 	return
+}
+
+func (r *Reader) ReadBool() (b bool, err error) {
+	bit, err := r.ReadBits(1)
+	if err != nil {
+		return false, err
+	}
+	return bit == 1, nil
+}
+
+func (r *Reader) Aligned() bool {
+	return r.size == 0
 }
 
 func (r *Reader) Align() (n uint8, l uint) {
@@ -57,5 +73,16 @@ func (r *Reader) Align() (n uint8, l uint) {
 	n = r.rest
 	r.size = 0
 	r.rest = 0
+	return
+}
+
+func (r *Reader) ReadBytes(l uint) (buf []byte, n uint, err error) {
+	r.Align()
+	buf = make([]byte, l)
+	sn, err := r.in.Read(buf)
+	if err != nil {
+		return nil, 0, err
+	}
+	n = uint(sn)
 	return
 }
